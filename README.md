@@ -4,11 +4,11 @@
   English · <a href="README.zh-CN.md">Simplified Chinese</a>
 </p>
 
-Ever reopened a saved Chrome Tab Group and watched your memory usage explode? You keep dozens of tabs around because you might need them later. While they sit idle, Chrome may keep their resource use under control, so the group seems harmless—until you close the browser or simply close the group without deleting it.
+Picture this: your Saved Tab Group has 30 or 40 tabs in it. They sit quietly in the background, and you keep them because you know you'll need them someday. But reopen the group, and Chrome may wake them all up at once. Memory shoots past 5 GB, even if you only wanted to check one page.
 
-Restore that group, and Chrome may wake up and load every tab at once. A group with 30–40 tabs can push memory use past 5 GB, even if you only wanted to resume one page.
+Close those tabs and lose the pages you saved; leave them alone and every restore can bring another memory hit, sometimes enough to bog Chrome down. Repeatedly cleaning them up by hand is a hassle, and it defeats the point of saving them for later.
 
-Closing those tabs would lose the pages you saved; keeping them loaded can mean a hefty memory bill. Tab Group Lazy Restore eases that tradeoff by discarding eligible tabs during the restore, helping bring memory use back down.
+**Tab Group Lazy Restore** helps ease that tradeoff. During a group restore, it discards eligible background tabs to bring memory use down afterward. Switch to a discarded tab and Chrome loads its page again.
 
 ## Installation
 
