@@ -1,6 +1,10 @@
 # Contributing
 
-Use Node.js 22.20.0 and pnpm 12.6.0 (the packageManager field pins pnpm). Install with `pnpm install --frozen-lockfile`. Only esbuild's install script is allowed in pnpm-workspace.yaml.
+Minimum supported versions: Node.js 22.13.0 and pnpm 12.6.0. The Node range follows Vitest: 22.13.0+ within Node 22, Node 24, or Node 26+. Node 23/25 are unsupported. Recommended development/release toolchain: Node.js 24 LTS and pnpm 12.11.2. Install the recommended pnpm with `npm install --global pnpm@12.11.2`, then run `pnpm install --frozen-lockfile`.
+
+package.json declares supported ranges in engines and devEngines.packageManager rather than requiring a single pnpm version. The package-manager range fails on unsupported versions instead of downloading a different version silently. CI checks the minimum pair and higher Node 24/26 pairs on Windows/Linux and asserts the actual versions before installing dependencies. Versions outside that matrix are allowed where the ranges match, but are not independently verified. Only esbuild's install script is allowed in pnpm-workspace.yaml.
+
+Dependabot automatic version updates are disabled. Review dependency and Actions updates manually, inspect migration notes, and run the same checks. Security alerts remain separate from automatic update PRs.
 
 Run `pnpm check`, `pnpm test:coverage`, `pnpm build:dev`, and `pnpm package:release`. Load the project directory in Chrome's developer-mode extensions page after building. Development output keeps source maps; release output is bundled without source maps.
 

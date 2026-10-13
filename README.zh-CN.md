@@ -44,7 +44,11 @@ Tab Group Lazy Restore 会在 Group 恢复时识别短时间内创建的同一�
 
 ## 开发与验证
 
-使用 Node.js 22.20.0 和 pnpm 12.6.0。克隆仓库后运行 `pnpm install --frozen-lockfile`，再执行：
+最低支持版本：**Node.js 22.13.0**、**pnpm 12.6.0**。Node 支持范围随 Vitest 依赖：22（22.13.0 及以上）、24 和 26 及以上；不支持 Node 23、25。推荐 **Node.js 24 LTS** 和 **pnpm 12.11.2**。这些工具只用于开发和构建，安装 Chrome 扩展 ZIP 不需要它们。
+
+CI 在 Windows/Linux 上校验最低版本组合、Node 24 + pnpm 12.11.2，以及 Node 26 + pnpm 12.11.2。声明的版本范围允许升级，但矩阵之外的版本尚未单独验证。依赖更新改为手动审核，Dependabot 自动 PR 已关闭。
+
+克隆仓库后运行 `pnpm install --frozen-lockfile`，再执行：
 
 ```sh
 pnpm check

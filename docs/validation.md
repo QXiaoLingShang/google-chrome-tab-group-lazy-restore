@@ -2,7 +2,7 @@
 
 ## Automated core checks
 
-Run `pnpm check`, `pnpm test:coverage`, `pnpm build:dev`, and `pnpm package:release`. CI runs on Windows and Linux with a frozen lockfile. Coverage reports are available as CI artifacts and at coverage/index.html locally.
+Run `pnpm check`, `pnpm test:coverage`, `pnpm build:dev`, and `pnpm package:release`. CI runs on Windows and Linux with a frozen lockfile for Node 22.13.0 + pnpm 12.6.0 (minimum), Node 24 + pnpm 12.11.2 (recommended LTS), and Node 26 + pnpm 12.11.2 (higher version). Each job asserts the selected versions so package-manager switching cannot invalidate the compatibility check. Coverage reports are available as CI artifacts and at coverage/index.html locally.
 
 The percentage covers only restoration settings, events, batching, and discard/retry behavior. It is not whole-extension coverage; options DOM, translations, real Chrome event ordering, service-worker termination, and OS memory reclamation need browser validation.
 

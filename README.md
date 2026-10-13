@@ -44,7 +44,11 @@ This is not true lazy loading. When Chrome opens a saved Tab Group, it may still
 
 ## Development and verification
 
-Use Node.js 22.20.0 and pnpm 12.6.0. Clone this repository, run `pnpm install --frozen-lockfile`, then:
+Minimum supported toolchain: **Node.js 22.13.0** and **pnpm 12.6.0**. Supported Node release lines follow Vitest: 22 (22.13.0+), 24, and 26+. Node 23 and 25 are not supported. Recommended: **Node.js 24 LTS** and **pnpm 12.11.2**. These tools are only needed to develop/build the extension, not to install its ZIP in Chrome.
+
+CI verifies Windows/Linux with the minimum pair, Node 24 + pnpm 12.11.2, and Node 26 + pnpm 12.11.2. Higher versions are allowed by the declared ranges; versions outside the matrix are not separately verified. Dependency updates are reviewed manually; automatic Dependabot PRs are disabled.
+
+Clone this repository, run `pnpm install --frozen-lockfile`, then:
 
 ```sh
 pnpm check

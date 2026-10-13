@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Disable Dependabot automatic version updates; review dependencies manually.
+- Declare minimum supported Node.js 22.13.0 and pnpm 12.6.0, recommend Node 24 LTS / pnpm 12.11.2, and validate minimum and higher toolchains on Windows/Linux.
+
 - Inspect restoring groups at a bounded cadence so a continuous stream of new tabs cannot postpone all discard work.
 - Recognize group membership reported directly by the tab-created event.
 - Process background-only restores and recheck tabs when navigation, pinning, or audible state changes.
