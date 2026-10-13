@@ -173,8 +173,8 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
       chrome-types:
-        specifier: ^0.1.440
-        version: 0.1.440
+        specifier: ^0.1.454
+        version: 0.1.454
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
@@ -724,8 +724,8 @@ packages:
     resolution: {integrity: sha512-XWAtwJ6OHO+tj0EKCs0Y2UamnyOxseZWltU4x2U2wh8g4AigdjwvtUjvLP2tqkA/avxHEtzxNaqGq/YGNwckKg==}
     engines: {node: '>=18'}
 
-  chrome-types@0.1.440:
-    resolution: {integrity: sha512-aYSvNzGDBtkfLzDw2PkVKcLZKhy7smYtyJ3OJKzUf75yje5yuwKGssQFDDinT/Y7sSUfXwi2tbvp1emE+jRg8w==}
+  chrome-types@0.1.454:
+    resolution: {integrity: sha512-TcWXppaNmQ+btuP4WYb+/Y+p/66Fq45rgZ0sAAbBNBatZlwblAHwSCU7M83EY+pL3em3aSWwZZXkSLMFVQOdAQ==}
 
   compress-commons@7.0.1:
     resolution: {integrity: sha512-g0S8KAD8qf4+V//pr3BfB1aBnARLXNz2Gx+jmHU0LEriUuoQUOPOulVquHKTJ8+EAIIO7fhseNDr9wK5Q9FKBQ==}
@@ -1423,7 +1423,7 @@ snapshots:
 
   chai@6.3.0: {}
 
-  chrome-types@0.1.440: {}
+  chrome-types@0.1.454: {}
 
   compress-commons@7.0.1:
     dependencies:
