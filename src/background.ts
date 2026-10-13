@@ -6,9 +6,7 @@ import {
   scheduleInspection,
   trackNewTab
 } from "./group.js";
-import {
-  notifyTitleUpdated
-} from "./discard.js";
+import { notifyTitleUpdated } from "./discard.js";
 import type { Tab } from "./types.js";
 
 chrome.tabs.onCreated.addListener(trackNewTab);
@@ -16,7 +14,14 @@ chrome.tabs.onCreated.addListener(trackNewTab);
 /** Handle Group, title, and URL updates for tracked restore batches. */
 function handleTabUpdated(
   _tabId: number,
-  changeInfo: { groupId?: number; title?: string; url?: string },
+  changeInfo: {
+    groupId?: number;
+    title?: string;
+    url?: string;
+    status?: string;
+    pinned?: boolean;
+    audible?: boolean;
+  },
   tab: Tab
 ): void {
   if (changeInfo.groupId !== undefined) {
@@ -25,18 +30,17 @@ function handleTabUpdated(
 
   const batch = getBatch(tab.windowId, tab.groupId ?? -1);
 
-  // fix: Wake the queue only when Chrome reports a title change and the batch enables title waiting.
-  if (
-    changeInfo.title !== undefined &&
-    tab.id !== undefined &&
-    batch?.waitForTitleBeforeDiscard
-  ) {
+  // Remember early title events even before asynchronous inspection loads settings.
+  if (changeInfo.title !== undefined && tab.id !== undefined && batch) {
     notifyTitleUpdated(tab.id, batch);
   }
 
   if (
     changeInfo.groupId === undefined &&
-    changeInfo.url === undefined
+    changeInfo.url === undefined &&
+    changeInfo.status === undefined &&
+    changeInfo.pinned === undefined &&
+    changeInfo.audible === undefined
   ) {
     return;
   }
@@ -49,7 +53,13 @@ function handleTabUpdated(
 chrome.tabs.onUpdated.addListener(handleTabUpdated);
 
 /** Protect the active Tab when Chrome reports an activation. */
-function handleTabActivated({ tabId, windowId }: { tabId: number; windowId: number }): void {
+function handleTabActivated({
+  tabId,
+  windowId
+}: {
+  tabId: number;
+  windowId: number;
+}): void {
   const batch = getBatchByTab(windowId, tabId);
   if (!batch) {
     return;

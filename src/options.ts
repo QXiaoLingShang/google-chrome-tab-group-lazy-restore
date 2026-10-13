@@ -33,36 +33,57 @@ const languageOptions = Array.from(
 );
 const minTabsField = requiredElement<HTMLInputElement>("#min-tabs");
 const waitForTitleField = requiredElement<HTMLInputElement>("#wait-for-title");
-const groupTitleListShell = requiredElement<HTMLDivElement>("#title-list-shell");
+const groupTitleListShell =
+  requiredElement<HTMLDivElement>("#title-list-shell");
 const groupTitleList = requiredElement<HTMLDivElement>("#title-list");
-const groupTitleListToggle = requiredElement<HTMLButtonElement>("#title-list-toggle");
+const groupTitleListToggle =
+  requiredElement<HTMLButtonElement>("#title-list-toggle");
 const groupTitleEntry = requiredElement<HTMLDivElement>("#title-entry");
 const addTitleButton = requiredElement<HTMLButtonElement>("#add-title-button");
 const settingsResetButton = requiredElement<HTMLButtonElement>("#reset-button");
 const settingsToastRegion = requiredElement<HTMLDivElement>("#toast-region");
 const saveStatus = requiredElement<HTMLSpanElement>("#save-status");
 const minTabsError = requiredElement<HTMLParagraphElement>("#min-tabs-error");
-const titleEntryError = requiredElement<HTMLParagraphElement>("#title-entry-error");
+const titleEntryError =
+  requiredElement<HTMLParagraphElement>("#title-entry-error");
 const advancedFields: Record<keyof AdvancedConfig, HTMLInputElement> = {
-  restoreWindowMs: requiredElement<HTMLInputElement>("#advanced-restore-window"),
-  recentTabCleanupPaddingMs: requiredElement<HTMLInputElement>("#advanced-cleanup-padding"),
-  inspectionDelayMs: requiredElement<HTMLInputElement>("#advanced-inspection-delay"),
+  restoreWindowMs: requiredElement<HTMLInputElement>(
+    "#advanced-restore-window"
+  ),
+  recentTabCleanupPaddingMs: requiredElement<HTMLInputElement>(
+    "#advanced-cleanup-padding"
+  ),
+  inspectionDelayMs: requiredElement<HTMLInputElement>(
+    "#advanced-inspection-delay"
+  ),
   batchTtlMs: requiredElement<HTMLInputElement>("#advanced-batch-ttl"),
   discardGapMs: requiredElement<HTMLInputElement>("#advanced-discard-gap"),
   retryDelayMs: requiredElement<HTMLInputElement>("#advanced-retry-delay"),
   maxDiscardRetries: requiredElement<HTMLInputElement>("#advanced-max-retries"),
-  maxConcurrentDiscards: requiredElement<HTMLInputElement>("#advanced-concurrency")
+  maxConcurrentDiscards: requiredElement<HTMLInputElement>(
+    "#advanced-concurrency"
+  )
 };
 const advancedKeys = Object.keys(advancedFields) as Array<keyof AdvancedConfig>;
 const advancedErrors: Record<keyof AdvancedConfig, HTMLSpanElement> = {
-  restoreWindowMs: requiredElement<HTMLSpanElement>("#advanced-restore-window-error"),
-  recentTabCleanupPaddingMs: requiredElement<HTMLSpanElement>("#advanced-cleanup-padding-error"),
-  inspectionDelayMs: requiredElement<HTMLSpanElement>("#advanced-inspection-delay-error"),
+  restoreWindowMs: requiredElement<HTMLSpanElement>(
+    "#advanced-restore-window-error"
+  ),
+  recentTabCleanupPaddingMs: requiredElement<HTMLSpanElement>(
+    "#advanced-cleanup-padding-error"
+  ),
+  inspectionDelayMs: requiredElement<HTMLSpanElement>(
+    "#advanced-inspection-delay-error"
+  ),
   batchTtlMs: requiredElement<HTMLSpanElement>("#advanced-batch-ttl-error"),
   discardGapMs: requiredElement<HTMLSpanElement>("#advanced-discard-gap-error"),
   retryDelayMs: requiredElement<HTMLSpanElement>("#advanced-retry-delay-error"),
-  maxDiscardRetries: requiredElement<HTMLSpanElement>("#advanced-max-retries-error"),
-  maxConcurrentDiscards: requiredElement<HTMLSpanElement>("#advanced-concurrency-error")
+  maxDiscardRetries: requiredElement<HTMLSpanElement>(
+    "#advanced-max-retries-error"
+  ),
+  maxConcurrentDiscards: requiredElement<HTMLSpanElement>(
+    "#advanced-concurrency-error"
+  )
 };
 
 let excludedGroupTitles: string[] = [];
@@ -227,7 +248,10 @@ function createTitleInput(value = ""): HTMLInputElement {
 }
 
 /** Render allowlist rows and the Add group input in the same foldable region. */
-function renderExcludedTitles(focusLast = false, collapseLongList = false): void {
+function renderExcludedTitles(
+  focusLast = false,
+  collapseLongList = false
+): void {
   groupTitleList.replaceChildren();
   groupTitleEntry.replaceChildren();
 
@@ -237,9 +261,14 @@ function renderExcludedTitles(focusLast = false, collapseLongList = false): void
     row.setAttribute("role", "listitem");
 
     const titleInput = createTitleInput(title);
-    setLocalizedAttribute(titleInput, "aria-label", "allowlistedGroupTitleAriaLabel", {
-      index: index + 1
-    });
+    setLocalizedAttribute(
+      titleInput,
+      "aria-label",
+      "allowlistedGroupTitleAriaLabel",
+      {
+        index: index + 1
+      }
+    );
     titleInput.addEventListener("change", () => {
       const value = titleInput.value.trim();
       if (!value) {
@@ -262,9 +291,14 @@ function renderExcludedTitles(focusLast = false, collapseLongList = false): void
     const removeButton = document.createElement("button");
     removeButton.className = "remove-title";
     removeButton.type = "button";
-    setLocalizedAttribute(removeButton, "aria-label", "removeAllowlistedGroupAriaLabel", {
-      title
-    });
+    setLocalizedAttribute(
+      removeButton,
+      "aria-label",
+      "removeAllowlistedGroupAriaLabel",
+      {
+        title
+      }
+    );
     removeButton.textContent = "×";
     removeButton.addEventListener("click", () => {
       excludedGroupTitles.splice(index, 1);
@@ -283,7 +317,11 @@ function renderExcludedTitles(focusLast = false, collapseLongList = false): void
 
   const emptyInput = createTitleInput();
   setLocalizedAttribute(emptyInput, "placeholder", "addGroupPlaceholder");
-  setLocalizedAttribute(emptyInput, "aria-label", "addAllowlistedGroupAriaLabel");
+  setLocalizedAttribute(
+    emptyInput,
+    "aria-label",
+    "addAllowlistedGroupAriaLabel"
+  );
   // fix: Enter can be followed by change on the old input; block the second commit and false duplicate error.
   let hasCommitted = false;
 
@@ -332,7 +370,9 @@ function renderExcludedTitles(focusLast = false, collapseLongList = false): void
 }
 
 groupTitleListToggle.addEventListener("click", () => {
-  setTitleListCollapsed(!groupTitleListShell.classList.contains("is-collapsed"));
+  setTitleListCollapsed(
+    !groupTitleListShell.classList.contains("is-collapsed")
+  );
 });
 
 /** Switch the page language and persist the user's manual selection. */
@@ -452,7 +492,9 @@ async function saveSettings(): Promise<void> {
   const config: RestoreConfig = {
     minTabs,
     excludedGroupTitles: [
-      ...new Set(excludedGroupTitles.map((title) => title.trim()).filter(Boolean))
+      ...new Set(
+        excludedGroupTitles.map((title) => title.trim()).filter(Boolean)
+      )
     ],
     waitForTitleBeforeDiscard: waitForTitleField.checked,
     advanced
@@ -483,13 +525,11 @@ async function resetSettings(): Promise<void> {
   }
 }
 
-[
-  minTabsField,
-  waitForTitleField,
-  ...Object.values(advancedFields)
-].forEach((field) => {
-  field.addEventListener("change", scheduleSave);
-});
+[minTabsField, waitForTitleField, ...Object.values(advancedFields)].forEach(
+  (field) => {
+    field.addEventListener("change", scheduleSave);
+  }
+);
 
 minTabsField.addEventListener("input", () => {
   setFieldError(minTabsField, minTabsError, "");

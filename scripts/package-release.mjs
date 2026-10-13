@@ -25,6 +25,7 @@ const archivePath = join(
 const requiredFiles = [
   ["manifest.json", "manifest.json"],
   ["options.html", "options.html"],
+  ["LICENSE", "LICENSE"],
   ["dist/background.js", "dist/background.js"],
   ["dist/options.js", "dist/options.js"]
 ];

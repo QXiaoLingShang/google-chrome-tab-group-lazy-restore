@@ -1,19 +1,32 @@
 {
-	"name": "tab-group-lazy-restore",
-	"version": "0.3.3",
-	"license": "MIT",
-	"private": true,
-	"scripts": {
-		"build": "pnpm build:dev",
-		"build:dev": "node scripts/build.mjs dev",
-		"build:release": "pnpm typecheck && node scripts/build.mjs release",
-		"package:release": "pnpm build:release && node scripts/package-release.mjs",
-		"typecheck": "tsc --noEmit -p tsconfig.json"
-	},
-	"devDependencies": {
-		"archiver": "^8.0.0",
-		"chrome-types": "^0.1.440",
-		"esbuild": "^0.28.2",
-		"typescript": "^7.0.2"
-	}
+  "name": "tab-group-lazy-restore",
+  "version": "0.3.3",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "pnpm build:dev",
+    "build:dev": "node scripts/build.mjs dev",
+    "build:release": "pnpm typecheck && node scripts/build.mjs release",
+    "package:release": "pnpm build:release && node scripts/package-release.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "pnpm format:check && pnpm typecheck"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^5.0.3",
+    "archiver": "^8.0.0",
+    "chrome-types": "^0.1.440",
+    "esbuild": "^0.28.2",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  },
+  "packageManager": "pnpm@12.6.0",
+  "engines": {
+    "node": ">=22.20.0 <23"
+  }
 }

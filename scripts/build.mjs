@@ -23,11 +23,15 @@ await mkdir(outputDirectory, { recursive: true });
 
 if (!isRelease) {
   // Keep the source module layout intact so browser debugging maps to real files.
-  await execFileAsync(process.execPath, [
-    resolve(projectRoot, "node_modules/typescript/bin/tsc"),
-    "--project",
-    resolve(projectRoot, "tsconfig.dev.json")
-  ], { cwd: projectRoot, stdio: "inherit" });
+  await execFileAsync(
+    process.execPath,
+    [
+      resolve(projectRoot, "node_modules/typescript/bin/tsc"),
+      "--project",
+      resolve(projectRoot, "tsconfig.dev.json")
+    ],
+    { cwd: projectRoot, stdio: "inherit" }
+  );
   process.exit(0);
 }
 

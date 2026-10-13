@@ -45,7 +45,8 @@ export function enqueueDiscard(batch: GroupBatch, tabs: Tab[]): void {
       tabId: tab.id,
       discardRetries: 0,
       titleObserved:
-        !batch.waitForTitleBeforeDiscard || batch.titleUpdatedTabIds.delete(tab.id)
+        !batch.waitForTitleBeforeDiscard ||
+        batch.titleUpdatedTabIds.delete(tab.id)
     };
     pendingTasks.set(tab.id, task);
     discardQueue.push(task);
@@ -56,14 +57,20 @@ export function enqueueDiscard(batch: GroupBatch, tabs: Tab[]): void {
 
 /** Wake a Tab that is waiting for its title. */
 export function notifyTitleUpdated(tabId: TabId, batch: GroupBatch): void {
+  if (!batch.tabIds.has(tabId)) {
+    return;
+  }
   const task = pendingTasks.get(tabId);
   // fix: A title event may arrive before inspection enqueues the task; remember it to avoid indefinite waiting.
-  if (!task || !task.batch.waitForTitleBeforeDiscard) {
+  if (!task) {
     batch.titleUpdatedTabIds.add(tabId);
     return;
   }
 
   // A title event only wakes a waiting task; repeated title events do not create duplicate tasks.
+  if (task.batch !== batch) {
+    return;
+  }
   const wasTitleRetrying = task.retryReason === "title";
   task.titleObserved = true;
   if (wasTitleRetrying) {
@@ -97,10 +104,18 @@ function retryTask(task: DiscardTask, reason: RetryReason): void {
     return;
   }
 
-  const delay = Math.max(
-    0,
-    Math.min(getAdvancedConfig().retryDelayMs, task.batch.deadline - Date.now())
-  );
+  // Only title waiting uses the deadline. Failed discards keep a real backoff,
+  // including after the title deadline, rather than spinning with zero-delay retries.
+  const delay =
+    reason === "title"
+      ? Math.max(
+          0,
+          Math.min(
+            getAdvancedConfig().retryDelayMs,
+            task.batch.deadline - Date.now()
+          )
+        )
+      : getAdvancedConfig().retryDelayMs;
   task.retryReason = reason;
   task.retryTimer = setTimeout(() => {
     task.retryReason = undefined;

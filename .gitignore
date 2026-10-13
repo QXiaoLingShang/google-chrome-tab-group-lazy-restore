@@ -3,4 +3,5 @@ dist/
 release/
 *.log
 .DS_Store
-/docs
+coverage/
+.pnpm-store/

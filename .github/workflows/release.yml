@@ -1,0 +1,44 @@
+name: Draft release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.20.0"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Verify tag and extension version
+        run: node -e 'const p=require("./package.json"),m=require("./manifest.json"); if(process.env.GITHUB_REF_NAME !== "v"+p.version || p.version !== m.version) process.exit(1)'
+      - run: pnpm check
+      - run: pnpm test:coverage
+      - run: pnpm package:release
+      - name: Validate ZIP
+        run: python -m zipfile -t "$(find release -name '*.zip' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-zip
+          path: release/*.zip
+          if-no-files-found: error
+  draft:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-zip
+          path: release
+      - name: Create draft for maintainer review
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" release/*.zip --draft --generate-notes --verify-tag

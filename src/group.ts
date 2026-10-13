@@ -6,17 +6,25 @@ import type { GroupBatch, RecentTab, Tab, TabId } from "./types.js";
 
 const recentTabs = new Map<TabId, RecentTab>();
 const batches = new Map<string, GroupBatch>();
+const inspecting = new WeakSet<GroupBatch>();
+const inspectAgain = new WeakSet<GroupBatch>();
 
 // Load persisted tuning values early so the first restore event does not use defaults.
 void loadRestoreConfig();
 
 /** Find the active restore batch for a window and Group. */
-export function getBatch(windowId: number, groupId: number): GroupBatch | undefined {
+export function getBatch(
+  windowId: number,
+  groupId: number
+): GroupBatch | undefined {
   return batches.get(`${windowId}:${groupId}`);
 }
 
 /** Find the restore batch that owns a tracked Tab. */
-export function getBatchByTab(windowId: number, tabId: TabId): GroupBatch | undefined {
+export function getBatchByTab(
+  windowId: number,
+  tabId: TabId
+): GroupBatch | undefined {
   for (const batch of batches.values()) {
     if (batch.windowId === windowId && batch.tabIds.has(tabId)) {
       return batch;
@@ -37,21 +45,31 @@ export function trackNewTab(tab: Tab): void {
     initialGroupId: tab.groupId ?? -1
   });
 
+  // Chrome may report the group on creation rather than in a later update.
+  detectGroup(tab);
+
   setTimeout(() => {
     const recent = recentTabs.get(tabId);
-    if (recent && Date.now() - recent.createdAt >= getAdvancedConfig().restoreWindowMs) {
+    if (
+      recent &&
+      Date.now() - recent.createdAt >= getAdvancedConfig().restoreWindowMs
+    ) {
       recentTabs.delete(tabId);
     }
-  },
-    getAdvancedConfig().restoreWindowMs +
-      getAdvancedConfig().recentTabCleanupPaddingMs
-  );
+  }, getAdvancedConfig().restoreWindowMs + getAdvancedConfig().recentTabCleanupPaddingMs);
 }
 
-/** Debounce inspection so a restoring Group can finish assembling. */
+/** Inspect at a bounded cadence; a long restore must not postpone every check. */
 export function scheduleInspection(batch: GroupBatch): void {
+  if (getBatch(batch.windowId, batch.groupId) !== batch) {
+    return;
+  }
+  if (inspecting.has(batch)) {
+    inspectAgain.add(batch);
+    return;
+  }
   if (batch.inspectTimer !== null) {
-    clearTimeout(batch.inspectTimer);
+    return;
   }
 
   batch.inspectTimer = setTimeout(() => {
@@ -69,7 +87,7 @@ export function detectGroup(tab: Tab): void {
   if (
     tabId === undefined ||
     !recent ||
-    recent.initialGroupId !== -1 ||
+    (recent.initialGroupId !== -1 && recent.initialGroupId !== groupId) ||
     groupId === -1 ||
     Date.now() - recent.createdAt > getAdvancedConfig().restoreWindowMs
   ) {
@@ -119,6 +137,21 @@ function createBatch(
 
 /** Inspect the Group and queue its safe background Tabs for discard. */
 async function inspectGroup(batch: GroupBatch): Promise<void> {
+  if (getBatch(batch.windowId, batch.groupId) !== batch) {
+    return;
+  }
+  inspecting.add(batch);
+  try {
+    await inspectGroupTabs(batch);
+  } finally {
+    inspecting.delete(batch);
+    if (inspectAgain.delete(batch)) {
+      scheduleInspection(batch);
+    }
+  }
+}
+
+async function inspectGroupTabs(batch: GroupBatch): Promise<void> {
   let groupTabs: Tab[];
 
   try {
@@ -131,7 +164,10 @@ async function inspectGroup(batch: GroupBatch): Promise<void> {
   }
 
   const restoreConfig = await loadRestoreConfig();
-  if (restoreConfig === null) {
+  if (
+    restoreConfig === null ||
+    getBatch(batch.windowId, batch.groupId) !== batch
+  ) {
     return;
   }
 
@@ -155,6 +191,11 @@ async function inspectGroup(batch: GroupBatch): Promise<void> {
     return;
   }
 
+  // An API response may arrive after expiry; never revive that restore batch.
+  if (getBatch(batch.windowId, batch.groupId) !== batch) {
+    return;
+  }
+
   const trackedTabs = groupTabs.filter(
     (tab) => tab.id !== undefined && batch.tabIds.has(tab.id)
   );
@@ -164,10 +205,13 @@ async function inspectGroup(batch: GroupBatch): Promise<void> {
     batch.protectedTabId = activeTab.id;
   }
 
-  if (batch.tabIds.size < 2 || batch.protectedTabId === null) {
+  // Background restores need no active member; eligibility still protects active tabs.
+  if (batch.tabIds.size < 2) {
     return;
   }
 
-  const discardableTabs = trackedTabs.filter((tab) => isDiscardable(tab, batch));
+  const discardableTabs = trackedTabs.filter((tab) =>
+    isDiscardable(tab, batch)
+  );
   enqueueDiscard(batch, discardableTabs);
 }

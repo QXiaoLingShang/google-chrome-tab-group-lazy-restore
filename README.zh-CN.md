@@ -12,7 +12,7 @@
 
 ## 安装
 
-1. 从 [最新 Release](https://github.com/QXiaoLingShang/chrome-tab-group-lazy-restore/releases) 下载 ZIP 安装包。
+1. 从 [最新 Release](https://github.com/QXiaoLingShang/google-chrome-tab-group-lazy-restore/releases) 下载 ZIP 安装包。
 2. 解压 ZIP 文件。
 3. 在 Chrome 中打开 `chrome://extensions/`，启用**开发者模式**。
 4. 点击**加载已解压的扩展程序（Load unpacked）**，选择包含 `manifest.json` 的解压文件夹。
@@ -30,17 +30,34 @@
 
 ## 原理
 
-Tab Group Lazy Restore 会在 Group 恢复时识别短时间内创建的同一批 Tab，然后按顺序处理：
+Tab Group Lazy Restore 会在 Group 恢复时识别短时间内创建的同一批 Tab，然后分批处理：
 
 1. 保留当前活动页。
 2. 将其余符合条件的后台 Tab 放入有限并发的 discard 队列，调用 `chrome.tabs.discard()` 将它们尽快从内存中释放。开启实验性设置后，Tab 会先等待 title 更新事件。
 3. 这些 Tab 仍然保留在原来的 Group 中；当你真正切换到某个 Tab 时，Chrome 再恢复它的页面内容。
 
-插件不会删除标签页，也不会扫描已经存在的普通标签页。固定、播放声音或仍在导航中的 Tab 会被跳过。
+插件不会删除标签页，也不会把已有标签页纳入释放候选。固定、播放声音或仍在导航中的 Tab 会被跳过；导航状态更新后会再次检查。持续恢复时会定期检查，无需等最后一个事件才开始处理。
 
 ## 已知问题
 
-这不是真正意义上的懒加载。Chrome 打开 Saved Tab Group 时，仍可能并行加载多个 Tab，因此打开 Group 后通常会有短暂的 1～2 秒内存高峰。插件无法阻止 Chrome 的初始加载，只能在识别出可处理的 Tab 后尽快调用 discard 来降低内存占用；Chrome 回收内存和刷新统计也可能存在额外延迟。
+这不是真正意义上的懒加载。Chrome 打开 Saved Tab Group 时，仍可能并行加载多个 Tab，因此打开 Group 后可能出现短暂的内存高峰。插件无法阻止 Chrome 的初始加载，只能在识别出可处理的 Tab 后尽快调用 discard 来降低内存占用；Chrome 回收内存和刷新统计也可能存在额外延迟。
+
+## 开发与验证
+
+使用 Node.js 22.20.0 和 pnpm 12.6.0。克隆仓库后运行 `pnpm install --frozen-lockfile`，再执行：
+
+```sh
+pnpm check
+pnpm test:coverage
+pnpm build:dev
+pnpm package:release
+```
+
+构建后，在 Chrome 中加载项目目录。ZIP 安装包生成在 `release/`。CI 在 Windows/Linux 上运行检查并保存覆盖率和安装包；与版本一致的标签会触发再次验证及草稿 Release，供维护者审核发布。
+
+覆盖率门槛针对恢复核心（事件、批次、队列和配置）：语句/行/函数 90%，分支 80%。设置页 DOM 和翻译不包含在此百分比中，需浏览器验证。实际内存改善需要单独测量。
+
+文档：[贡献说明](CONTRIBUTING.md)、[隐私说明](PRIVACY.md)、[安全报告](SECURITY.md)、[变更记录](CHANGELOG.md)、[浏览器验证](docs/validation.md)、[同类仓库对照](docs/project-review.zh-CN.md)、[真正懒恢复方案](docs/true-lazy-restore.zh-CN.md)。
 
 ## 源码结构
 

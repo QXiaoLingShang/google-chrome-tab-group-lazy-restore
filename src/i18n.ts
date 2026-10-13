@@ -12,11 +12,13 @@ const englishMessages = {
   unableToSave: "Save failed",
   fixHighlightedField: "Check the highlighted fields.",
   minimumTabCount: "Minimum number of tabs",
-  minimumTabCountDescription: "Groups with this number of tabs or fewer won't be discarded.",
+  minimumTabCountDescription:
+    "Groups with this number of tabs or fewer won't be discarded.",
   minimumTabCountError: "Enter a non-negative whole number.",
   waitForTabTitles: "Wait for tab titles before discarding",
   experimental: "Experimental",
-  waitForTabTitlesDescription: "Wait for a tab's title to load before discarding it.",
+  waitForTabTitlesDescription:
+    "Wait for a tab's title to load before discarding it.",
   waitForTabTitlesAriaLabel: "Wait for tab titles before discarding tabs",
   waitForTabTitlesWarning:
     "Experimental: This may keep memory usage high for longer while a group is opening.",
@@ -42,7 +44,7 @@ const englishMessages = {
     "Extra time to keep tracking a new tab after the detection window ends.",
   groupInspectionDelay: "Group check delay (ms)",
   groupInspectionDelayDescription:
-    "Wait this long after tabs join a group before checking which tabs can be discarded.",
+    "Delay before checking eligible tabs. New events do not restart a pending check.",
   restoreBatchLifetime: "Restore timeout (ms)",
   restoreBatchLifetimeDescription:
     "Maximum time to handle a group restore, including time spent waiting for tab titles.",
@@ -113,19 +115,17 @@ const messages: Record<Language, Record<TranslationKey, string>> = {
       "检测窗口结束后，继续跟踪新建标签页的额外时间。",
     groupInspectionDelay: "标签组检查延迟（ms）",
     groupInspectionDelayDescription:
-      "标签页加入标签组后，等待这段时间再检查哪些标签页可以释放。",
+      "检查可释放标签页前的等待时间；新事件不会推迟已安排的检查。",
     restoreBatchLifetime: "恢复超时（ms）",
     restoreBatchLifetimeDescription:
       "一次标签组恢复最多持续的时间，包括等待标签页标题的时间。",
     discardStartGap: "释放间隔（ms）",
-    discardStartGapDescription:
-      "等待这段时间后，再开始下一次释放操作。",
+    discardStartGapDescription: "等待这段时间后，再开始下一次释放操作。",
     retryDelay: "重试延迟（ms）",
     retryDelayDescription:
       "再次检查标题或重试释放失败的标签页前，最多等待的时间。",
     maximumDiscardRetries: "释放重试次数上限",
-    maximumDiscardRetriesDescription:
-      "释放操作失败后，最多重试的次数。",
+    maximumDiscardRetriesDescription: "释放操作失败后，最多重试的次数。",
     discardConcurrency: "同时释放数量上限",
     discardConcurrencyDescription: "同时最多释放的标签页数量。",
     advancedIntegerRangeError: "请输入 {min} 到 {max} 之间的整数。",
@@ -171,14 +171,20 @@ function isTranslationKey(value: string): value is TranslationKey {
 
 /** Resolve Chinese for any Chinese browser locale and English everywhere else. */
 function detectBrowserLanguage(): Language {
-  const browserLanguages = navigator.languages.length > 0 ? navigator.languages : [navigator.language];
-  return browserLanguages.some((language) => language.toLowerCase().startsWith("zh"))
+  const browserLanguages =
+    navigator.languages.length > 0 ? navigator.languages : [navigator.language];
+  return browserLanguages.some((language) =>
+    language.toLowerCase().startsWith("zh")
+  )
     ? "zh-CN"
     : "en";
 }
 
 /** Replace named placeholders without allowing missing values to erase the template. */
-function interpolate(template: string, parameters?: TranslationParameters): string {
+function interpolate(
+  template: string,
+  parameters?: TranslationParameters
+): string {
   return template.replace(/\{(\w+)\}/g, (placeholder, name: string) => {
     const value = parameters?.[name];
     return value === undefined ? placeholder : String(value);
@@ -186,7 +192,11 @@ function interpolate(template: string, parameters?: TranslationParameters): stri
 }
 
 /** Remove an older dynamic descriptor before registering its replacement. */
-function forgetDescriptor(element: Element, kind: LocalizedDescriptor["kind"], attribute?: string): void {
+function forgetDescriptor(
+  element: Element,
+  kind: LocalizedDescriptor["kind"],
+  attribute?: string
+): void {
   for (const descriptor of localizedDescriptors) {
     if (
       descriptor.element === element &&
@@ -210,7 +220,10 @@ function renderDescriptor(descriptor: LocalizedDescriptor): void {
 }
 
 /** Translate a message using the currently selected language. */
-export function t(key: TranslationKey, parameters?: TranslationParameters): string {
+export function t(
+  key: TranslationKey,
+  parameters?: TranslationParameters
+): string {
   return interpolate(messages[currentLanguage][key], parameters);
 }
 
@@ -260,7 +273,9 @@ export function getCurrentLanguage(): Language {
 /** Load the saved language preference, falling back to the browser language. */
 export async function loadLanguagePreference(): Promise<Language> {
   try {
-    const stored = await chrome.storage.local.get({ [LANGUAGE_STORAGE_KEY]: null });
+    const stored = await chrome.storage.local.get({
+      [LANGUAGE_STORAGE_KEY]: null
+    });
     return isLanguage(stored[LANGUAGE_STORAGE_KEY])
       ? stored[LANGUAGE_STORAGE_KEY]
       : detectBrowserLanguage();
@@ -270,7 +285,9 @@ export async function loadLanguagePreference(): Promise<Language> {
 }
 
 /** Persist the manually selected language for future options-page visits. */
-export async function saveLanguagePreference(language: Language): Promise<void> {
+export async function saveLanguagePreference(
+  language: Language
+): Promise<void> {
   await chrome.storage.local.set({ [LANGUAGE_STORAGE_KEY]: language });
 }
 
@@ -286,7 +303,12 @@ export function setLocalizedText(
     return;
   }
 
-  const descriptor: LocalizedDescriptor = { element, kind: "text", key, parameters };
+  const descriptor: LocalizedDescriptor = {
+    element,
+    kind: "text",
+    key,
+    parameters
+  };
   localizedDescriptors.add(descriptor);
   renderDescriptor(descriptor);
 }
@@ -299,7 +321,13 @@ export function setLocalizedAttribute(
   parameters?: TranslationParameters
 ): void {
   forgetDescriptor(element, "attribute", attribute);
-  const descriptor: LocalizedDescriptor = { element, kind: "attribute", attribute, key, parameters };
+  const descriptor: LocalizedDescriptor = {
+    element,
+    kind: "attribute",
+    attribute,
+    key,
+    parameters
+  };
   localizedDescriptors.add(descriptor);
   renderDescriptor(descriptor);
 }

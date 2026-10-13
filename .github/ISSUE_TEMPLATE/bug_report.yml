@@ -1,0 +1,28 @@
+name: Bug report
+description: Report a restore, memory, or settings problem.
+body:
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Chrome version, OS, extension version, and relevant settings.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include group size, native restore entry point, and whether tabs play audio or remain navigating. Use synthetic URLs; remove personal browsing data.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: measurement
+    attributes:
+      label: Measurements or logs (optional)
+      description: For memory issues, record the measurement tool, baseline, peak, recovery time, and comparison with the extension disabled. Remove private URLs.
